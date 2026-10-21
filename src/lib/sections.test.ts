@@ -67,6 +67,15 @@ describe("section list", () => {
 			expect(others, `Move these pages from ${section.path}/ into a subsection`).toEqual([]);
 		}
 	});
+
+	it("gives each editable section an index.md and only .md pages", () => {
+		for (const section of resolved.filter((s) => s.section.editable)) {
+			const pages = folders.get(section.path) ?? [];
+			expect(pages, `${section.path}/ needs an index.md`).toContain("index.md");
+			const mdx = pages.filter((file) => file.endsWith(".mdx"));
+			expect(mdx, `${section.path}/ is editable, so it can't have .mdx pages`).toEqual([]);
+		}
+	});
 });
 
 describe("flattenSections", () => {
@@ -75,7 +84,15 @@ describe("flattenSections", () => {
 			{
 				folder: "a",
 				label: "A",
-				sections: [{ folder: "b", label: "B", sections: [{ folder: "c", label: "C" }] }],
+				editable: true,
+				sections: [
+					{
+						folder: "b",
+						label: "B",
+						editable: true,
+						sections: [{ folder: "c", label: "C", editable: false }],
+					},
+				],
 			},
 		];
 		expect(
@@ -98,9 +115,17 @@ describe("buildSidebar", () => {
 			{
 				folder: "a",
 				label: "A",
-				sections: [{ folder: "b", label: "B", sections: [{ folder: "c", label: "C" }] }],
+				editable: true,
+				sections: [
+					{
+						folder: "b",
+						label: "B",
+						editable: true,
+						sections: [{ folder: "c", label: "C", editable: false }],
+					},
+				],
 			},
-			{ folder: "d", label: "D" },
+			{ folder: "d", label: "D", editable: false },
 		];
 		expect(buildSidebar(tree)).toEqual([
 			{

@@ -1,0 +1,128 @@
+# Pages CMS configuration (https://pagescms.org/docs/configuration/).
+#
+# GENERATED FILE: don't edit. It is built from the section list in src/lib/sections.ts
+# by src/lib/pages-cms.ts. Run `pnpm cms:generate` after changing either one; a test
+# fails when this file is out of date.
+#
+# Pages CMS doesn't enforce every setting on its server, so GitHub is the security
+# boundary (see "Security" in README.md). This file is still kept tight, and
+# src/lib/pages-cms-config.test.ts checks the rules below:
+#
+# - Content: each editable section has an "Overview" entry for its index.md, which
+#   can't be deleted or renamed. A section without subsections also has a collection
+#   for its other pages, limited to its own folder (no subfolders, no renaming).
+#   Only `.md` files: Pages CMS lists and saves only files with the extension of
+#   `filename`, so `.mdx` files are never shown or written.
+# - Media: raster images only, stored in each section's `images/` folder, next to its
+#   pages, so Astro optimizes them.
+# - Fields: shared definitions in `components`. Fields listed in `topicRules`
+#   (src/lib/topics.ts) are required.
+# - No `actions` (buttons that start GitHub workflows). Pages CMS doesn't check them on
+#   its server.
+
+media:
+  - name: finance__images
+    label: Finance images
+    input: src/content/docs/finance/images
+    output: ./images
+    extensions: [png, jpg, jpeg, webp, avif, gif]
+    rename: safe
+  - name: finance_mortgages__images
+    label: Finance › Mortgages images
+    input: src/content/docs/finance/mortgages/images
+    output: ./images
+    extensions: [png, jpg, jpeg, webp, avif, gif]
+    rename: safe
+components:
+  title:
+    label: Title
+    type: string
+    required: true
+  description:
+    label: Description
+    description: One sentence that sums up the page. Shown in search results.
+    type: text
+    required: true
+  tags:
+    label: Tags
+    type: string
+    list: true
+  draft:
+    label: Draft
+    description: Drafts appear in previews but not on the public site.
+    type: boolean
+  reviewed:
+    label: Last reviewed
+    description: The date you last checked this page for accuracy.
+    type: date
+  updated:
+    label: Last updated (override)
+    description: Leave empty. The site uses the date of the last change.
+    type: date
+  created:
+    label: Created
+    type: date
+  body:
+    label: Body
+    type: rich-text
+    options:
+      format: markdown
+content:
+  - name: finance__overview
+    label: Finance › Overview
+    type: file
+    path: src/content/docs/finance/index.md
+    fields:
+      - {name: title, component: title}
+      - {name: description, component: description}
+      - {name: tags, component: tags}
+      - {name: reviewed, component: reviewed, required: true}
+      - {name: updated, component: updated}
+      - {name: body, component: body, options: {media: finance__images}}
+  - name: finance_mortgages
+    label: Finance › Mortgages
+    type: collection
+    path: src/content/docs/finance/mortgages
+    filename: "{primary}.md"
+    exclude: [index.md]
+    subfolders: false
+    operations:
+      rename: false
+    view:
+      primary: title
+      fields: [title, reviewed, draft]
+      sort: [title, reviewed]
+      default:
+        sort: title
+        order: asc
+    fields:
+      - {name: title, component: title}
+      - {name: description, component: description}
+      - {name: tags, component: tags}
+      - {name: draft, component: draft}
+      - {name: reviewed, component: reviewed, required: true}
+      - {name: updated, component: updated}
+      - {name: created, component: created}
+      - {name: body, component: body, options: {media: finance_mortgages__images}}
+  - name: finance_mortgages__overview
+    label: Finance › Mortgages › Overview
+    type: file
+    path: src/content/docs/finance/mortgages/index.md
+    fields:
+      - {name: title, component: title}
+      - {name: description, component: description}
+      - {name: tags, component: tags}
+      - {name: reviewed, component: reviewed, required: true}
+      - {name: updated, component: updated}
+      - {name: body, component: body, options: {media: finance_mortgages__images}}
+settings:
+  hide: true
+  content:
+    merge: true
+  commit:
+    identity: user
+    templates:
+      create: Create {path} by {userName} (via Pages CMS)
+      update: Update {path} by {userName} (via Pages CMS)
+      delete: Delete {path} by {userName} (via Pages CMS)
+      rename: Rename {oldPath} to {newPath} by {userName} (via Pages CMS)
