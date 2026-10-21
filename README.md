@@ -45,33 +45,43 @@ Temporary home: `guides.stellway.me`
 | Previews | One per pull request. Public, but hidden from search engines. |
 | Review | Changes merge through pull requests with at least one approval. Checks must pass. |
 | Finance disclaimer | Every finance page shows a notice automatically: *"This guide is general education, not financial, tax, or legal advice. Rules and rates change. Last reviewed: {date}."* Finance pages must have a `reviewed` date. |
+| Web editor | Hosted [Pages CMS](https://pagescms.org). Collaborators are invited by email and need no GitHub account. Edits are saved to a shared `content` branch, and one pull request from `content` to `main` collects them for review and preview. See [Security](#security). |
+| Deploy frequency | Production deploys only when `main` changes. Web-editor edits pile up on the `content` branch, so we control deploys by choosing when to merge it. |
 | Licensing | Code: MIT ([LICENSE](LICENSE)). Content: CC BY 4.0 ([LICENSE-CONTENT](LICENSE-CONTENT)). |
 
 ## Editing experience
 
-There is no custom editor. All edits end in a reviewed pull request, whichever way they are made:
+We don't build a custom editor. All edits end in a reviewed pull request, whichever way they are made:
 
 | Who | How |
 |---|---|
 | Developers | Edit locally with a live dev server |
 | Comfortable with GitHub | "Edit this page" link → GitHub's web editor |
-| Non-technical | A git-backed web editor (CMS) with form fields and a word-processor-style editor (candidates below) |
+| Non-technical | Pages CMS: form fields plus a word-processor-style editor, saving to the `content` branch |
+
+## Security
+
+GitHub, not Pages CMS, is the security boundary. A 2026-10 review found that Pages CMS doesn't enforce on its server which branches collaborators can write to or which workflows they can trigger. Its hosted operator can also write to repos where the app is installed. The safeguards below limit the worst case to a bad pull request:
+
+1. **One repo only.** The Pages CMS GitHub App is installed on this repository only.
+2. **Protected `main`.** Changes need an approved pull request and passing checks. The app gets no exception.
+3. **Owners for sensitive files.** CODEOWNERS requires owner review for `.github/`, `.pages.yml`, `package.json`, and build config.
+4. **Secrets only on `main`.** Deploy secrets live in a GitHub Environment limited to `main`. Workflows on other branches get no secrets and read-only access.
+5. **No free-form workflow inputs.** No workflow accepts a `payload` input or puts inputs into shell commands.
+6. **Tight `.pages.yml`.**
+   - Specific content folders.
+   - Image-only uploads (no SVG or HTML).
+   - `.md` files, not `.mdx`.
+   - `settings.commit.identity: user`, so commits are credited to the real person.
+7. **HTML cleanup.** The site build strips or sanitizes raw HTML in Markdown.
+
+Revisit hosting when the Pages CMS rewrite ships. It fixes several of these issues and adds self-hosting on Cloudflare.
 
 ## Open decisions
 
-1. **Site framework.** The leading candidate is [Astro](https://astro.build) with [Starlight](https://starlight.astro.build), which provides docs layout, search, drafts, and MDX. Not decided, and it should be chosen together with the web editor.
-2. **Web editor (CMS).** This is needed at launch. Candidates to evaluate:
-   - **[Pages CMS](https://pagescms.org):** a hosted service, so the site stays fully static. Configured with a file in the repo.
-   - **[Keystatic](https://keystatic.com):** a more polished editor hosted on our site. Needs a small server function and a GitHub App.
-
-   Criteria to compare:
-   - how easy it is for non-technical contributors
-   - whether contributors need a GitHub account
-   - how it handles our frontmatter, images, and MDX
-   - whether it creates pull requests rather than committing directly
-   - setup and upkeep
-3. **Interactive component library.** Tentatively Preact (React-style code, small download, official Astro integration). It depends on the site framework.
-4. **Site name and domain.** "Guides" on `guides.stellway.me` for now.
+1. **Site framework.** The leading candidate is [Astro](https://astro.build) with [Starlight](https://starlight.astro.build), which provides docs layout, search, drafts, and MDX. Not decided. Pages CMS works with any framework that reads Markdown files.
+2. **Interactive component library.** Tentatively Preact (React-style code, small download, official Astro integration). It depends on the site framework.
+3. **Site name and domain.** "Guides" on `guides.stellway.me` for now.
 
 ## Contributing
 

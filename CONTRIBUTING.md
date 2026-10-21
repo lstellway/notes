@@ -23,7 +23,7 @@ Work locally when you are adding interactive components or making changes across
 
 ### 3. Web editor
 
-Contributors who don't use GitHub can sign in to the site's web editor. The tool hasn't been chosen yet; see the README's open decisions. Saving creates a pull request that is reviewed the same way. The web editor handles plain articles best. Articles that embed interactive components may need to be edited on GitHub or locally.
+Contributors who don't use GitHub are invited by email to [Pages CMS](https://pagescms.org). Always edit on the `content` branch. Your saves collect there, and they go live after the pull request from `content` to `main` is reviewed and merged. The web editor handles plain articles best. Articles that embed interactive components may need to be edited on GitHub or locally.
 
 ## Drafts
 
