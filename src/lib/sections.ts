@@ -11,15 +11,23 @@
  * - A section without subsections lists all of its pages in the sidebar, sorted by
  *   `sidebar.order` and then by title.
  * - Folder names are lowercase and hyphenated. `images` is reserved for images.
+ * - An editable section has an `index.md` overview page and no `.mdx` pages.
  *
- * To add a section, add an entry below and create its folder.
+ * The web editor's config (`.pages.yml`) is generated from this list too. To add a
+ * section, add an entry below, create its folder with an `index.md`, and run
+ * `pnpm cms:generate`.
  */
 
 export interface Section {
 	/** Folder name inside the parent section (or inside `src/content/docs/` for a topic). */
 	folder: string;
-	/** Name shown in the sidebar. */
+	/** Name shown in the sidebar and the web editor. */
 	label: string;
+	/**
+	 * Whether the web editor (Pages CMS) can edit this section: its overview page, and
+	 * its other pages if it has no subsections. Only for sections of plain `.md` pages.
+	 */
+	editable: boolean;
 	/** Subsections, in sidebar order. */
 	sections?: readonly Section[];
 }
@@ -28,12 +36,15 @@ export const sections: readonly Section[] = [
 	{
 		folder: "finance",
 		label: "Finance",
+		editable: true,
 		sections: [
-			{ folder: "mortgages", label: "Mortgages" },
-			{ folder: "tools", label: "Tools" },
+			{ folder: "mortgages", label: "Mortgages", editable: true },
+			// Calculators are `.mdx` pages with interactive components, so they're edited as code.
+			{ folder: "tools", label: "Tools", editable: false },
 		],
 	},
-	{ folder: "contributing", label: "Contributing" },
+	// Docs about this site, reviewed with the code.
+	{ folder: "contributing", label: "Contributing", editable: false },
 ];
 
 /** A section with its position in the hierarchy worked out. */

@@ -15,6 +15,7 @@
 		"lint": "biome check .",
 		"format": "biome check --write .",
 		"test": "vitest run",
+		"cms:generate": "node scripts/cms-generate.ts",
 		"verify": "pnpm check && pnpm lint && pnpm test && pnpm build"
 	},
 	"dependencies": {
@@ -35,7 +36,7 @@
 		"@biomejs/biome": "2.5.15",
 		"@types/hast": "3.0.5",
 		"@types/mdast": "4.0.4",
-		"@types/node": "24.19.2",
+		"@types/node": "26.6.5",
 		"rehype-stringify": "10.0.1",
 		"remark-parse": "11.0.0",
 		"remark-rehype": "11.1.2",
@@ -44,6 +45,7 @@
 		"unified": "11.0.5",
 		"vfile": "6.0.3",
 		"vitest": "5.0.5",
-		"wrangler": "4.151.1"
+		"wrangler": "4.151.1",
+		"yaml": "2.9.1"
 	}
 }

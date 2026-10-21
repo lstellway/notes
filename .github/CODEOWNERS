@@ -1,0 +1,41 @@
+# Code owners must approve changes to the files below. Anything not listed can be
+# approved by any reviewer with write access.
+#
+# The last matching line wins, so the broad rules come first and the exceptions
+# after them. A line with no owner removes the owner for the files it matches.
+# Owner review is only required once the `main` ruleset turns on "Require review
+# from Code Owners" (see docs/setup.md).
+
+# Workflows, actions, Dependabot, and this file.
+/.github/ @lstellway
+
+# Web editor config (generated from src/lib/sections.ts) and its generator script.
+/.pages.yml @lstellway
+/scripts/ @lstellway
+
+# Dependencies, build, and hosting config.
+/package.json @lstellway
+/pnpm-lock.yaml @lstellway
+/pnpm-workspace.yaml @lstellway
+/.node-version @lstellway
+/wrangler.jsonc @lstellway
+/astro.config.* @lstellway
+/tsconfig.json @lstellway
+/biome.json @lstellway
+/vitest.config.* @lstellway
+
+# Site code: components, libraries, pages, styles, and content config.
+/src/ @lstellway
+
+# Exception: plain Markdown pages and raster images in the content folder (what the
+# web editor writes). Any reviewer can approve these.
+/src/content/docs/**/*.md
+/src/content/docs/**/*.png
+/src/content/docs/**/*.jpg
+/src/content/docs/**/*.jpeg
+/src/content/docs/**/*.webp
+/src/content/docs/**/*.avif
+/src/content/docs/**/*.gif
+
+# MDX can run code, so it is reviewed as code wherever it is.
+*.mdx @lstellway
