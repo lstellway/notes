@@ -29,7 +29,7 @@ export default defineConfig({
 		starlight({
 			title: "Guides",
 			description: "Practical guides, starting with personal finance.",
-			// Dates come from git history.
+			// Dates come from git history; frontmatter `updated` overrides them.
 			lastUpdated: true,
 			editLink: {
 				baseUrl: "https://github.com/lstellway/notes/edit/main/",
@@ -43,6 +43,7 @@ export default defineConfig({
 			components: {
 				MarkdownContent: "./src/components/MarkdownContent.astro",
 			},
+			routeMiddleware: "./src/route-middleware.ts",
 			// Fails the build on broken internal links.
 			plugins: [starlightLinksValidator()],
 		}),

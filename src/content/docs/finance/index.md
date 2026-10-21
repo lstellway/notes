@@ -1,6 +1,7 @@
 ---
 title: Finance
 description: Guides to personal finance.
+reviewed: 2026-10-20
 sidebar:
   label: Overview
   order: 0
