@@ -67,14 +67,16 @@ GitHub, not Pages CMS, is the security boundary. A 2026-10 review found that Pag
 
 1. **One repo only.** The Pages CMS GitHub App is installed on this repository only.
 2. **Protected `main`.** Changes need an approved pull request and passing checks. The app gets no exception.
-3. **Owners for sensitive files.** CODEOWNERS requires owner review for `.github/`, `.pages.yml`, `package.json`, and build config.
+3. **Owners for sensitive files.** [CODEOWNERS](.github/CODEOWNERS) requires owner review for `.github/`, `.pages.yml`, dependencies, build config, site code under `src/`, and `.mdx` files. Markdown pages and images in the content folder can be approved by any reviewer.
 4. **Secrets only on `main`.** Deploy secrets live in a GitHub Environment limited to `main`. Workflows on other branches get no secrets and read-only access.
 5. **No free-form workflow inputs.** No workflow accepts a `payload` input or puts inputs into shell commands.
-6. **Tight `.pages.yml`.**
-   - Specific content folders.
-   - Image-only uploads (no SVG or HTML).
+6. **Tight [`.pages.yml`](.pages.yml).** A unit test checks these rules.
+   - One content folder per topic (`src/content/docs/<topic>/`), with no subfolders.
+   - Raster image uploads only (PNG, JPEG, WebP, AVIF, GIF; no SVG or HTML), saved in the topic's `images/` folder.
    - `.md` files, not `.mdx`.
+   - No actions (buttons that start workflows), because Pages CMS doesn't check them on its server.
    - `settings.commit.identity: user`, so commits are credited to the real person.
+   - The Pages CMS Settings page is hidden, so `.pages.yml` is changed through reviewed pull requests.
 7. **HTML cleanup.** The site build removes raw HTML from `.md` files, drops unsafe links such as `javascript:`, and rejects frontmatter fields that would add raw HTML to a page. `.mdx` files can contain code, so they are reviewed as code.
 
 Revisit hosting when the Pages CMS rewrite ships. It fixes several of these issues and adds self-hosting on Cloudflare.

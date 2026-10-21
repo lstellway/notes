@@ -25,7 +25,20 @@ Work locally when you are adding interactive components or making changes across
 
 ### 3. Web editor
 
-Contributors who don't use GitHub are invited by email to [Pages CMS](https://pagescms.org). Always edit on the `content` branch. Your saves collect there, and they go live after the pull request from `content` to `main` is reviewed and merged. The web editor handles plain articles best. Articles that embed interactive components may need to be edited on GitHub or locally.
+For contributors who don't use GitHub. You don't need a GitHub account.
+
+1. **Sign in.** Open the invitation email from Pages CMS and select **Join**. Next time, go to [app.pagescms.org](https://app.pagescms.org) and sign in with the same email address.
+2. **Choose the `content` branch.** Use the branch menu at the top before you change anything, every time. The editor opens on `main`, which is not where edits go.
+3. **Edit.** Open **Finance guides** to edit a guide, or add a new entry to start one. The file name is made from the title. Fill in the title, description, and "Last reviewed" date, then write in the editor.
+4. **Save.** Each save is kept on the `content` branch, under your name.
+5. **Check the preview.** Your changes appear on the preview site (ask a maintainer for the link). They go live after a reviewer approves them.
+
+Good to know:
+
+- Saving may tidy up the page's formatting, such as spacing or list markers. Check that the page still looks right in the preview.
+- Uploads are limited to images (PNG, JPEG, WebP, AVIF, or GIF). Add a short description of each image for readers who can't see it.
+- Pages that use interactive components (`.mdx` files), such as the home page, don't appear in the web editor. Edit them on GitHub or locally.
+- Turn on **Draft** to save work in progress without publishing it.
 
 ## Drafts
 
@@ -56,6 +69,7 @@ Every folder of pages under `src/content/docs/` is a section, listed in `src/lib
 - **One topic per note.** Link to related notes instead of repeating them.
 - **File placement:** put notes in the folder for their section under `src/content/docs/`, such as `src/content/docs/finance/mortgages/`. Use lowercase, hyphenated file names like `fixed-vs-adjustable-mortgages.md`. Pages appear in their section's sidebar group automatically, ordered by `sidebar.order` and then by title.
 - **Sections:** topics (like `finance/`) are split into section folders (like `finance/mortgages/`), which can have their own subsections. A section with subsections holds only its overview page (`index.md`); its other pages go in a subsection. See [Adding a section](#adding-a-section).
+- **Images:** put images in the topic's `images/` folder, such as `src/content/docs/finance/images/`, and link to them with a relative path: `![Short description](./images/amortization-chart.png)`. The site resizes and compresses them. Use PNG, JPEG, WebP, AVIF, or GIF.
 - **Links:** link to other notes with their path on the site, starting with `/`, like `[Mortgages](/finance/mortgages/)`. The build fails if a link points to a page that doesn't exist.
 - **Frontmatter:** include at least a `title` and a `description`. Tags are optional.
 - **Dates:** the "Last updated" date on each page comes from git. Add `updated` to the frontmatter only to override it, for example after moving a file. `created` is optional and isn't shown on pages yet.

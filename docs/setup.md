@@ -99,12 +99,49 @@ Dependabot's support for pnpm 12 lockfiles is new. Alerts for indirect dependenc
 
 Previews only work once the Worker exists and `preview.yml` is on `main`. To check, push a commit to any open pull request.
 
-## 4. Web editor branch
+## 4. Web editor (Pages CMS)
 
-1. Create the `content` branch from `main` (on GitHub: branch menu → type `content` → **Create branch**), and point Pages CMS at it.
-2. Each time the `content` pull request is opened, a maintainer may need to select **Approve workflows to run** on it. After that, CI runs on every save. This happens because GitHub holds the first run on pull requests opened by a workflow.
+The web editor is the hosted [Pages CMS](https://pagescms.org) at [app.pagescms.org](https://app.pagescms.org). What editors can change is set in [`.pages.yml`](../.pages.yml). Pages CMS reads that file from the branch being edited, so changes to it reach editors once they are on `content`.
+
+Pages CMS doesn't stop editors from choosing another branch. Until `main` is protected (section 5), a save on `main` would go straight to the live site. **Do section 5 before inviting anyone.**
+
+### 4.1 Content branch
+
+Once `.pages.yml` is on `main`, create the `content` branch from `main` (on GitHub: branch menu → type `content` → **Create branch**).
+
+### 4.2 Install the GitHub App on this repository only
+
+1. Go to [app.pagescms.org](https://app.pagescms.org) and choose **Sign in with GitHub**.
+2. When asked to install the Pages CMS GitHub App, choose **Only select repositories** and pick `lstellway/notes`. Don't choose **All repositories**: the app can write to every repository it is installed on.
+3. To check later: GitHub → **Settings → Applications → Installed GitHub Apps → Pages CMS → Configure**. It should list this repository only.
+
+### 4.3 Open the repository
+
+1. In Pages CMS, open `lstellway/notes`.
+2. Switch to the `content` branch with the branch menu.
+3. Check that **Finance guides**, **Finance overview**, and **Finance images** appear. The Settings page is hidden on purpose: `.pages.yml` is changed through pull requests, where CODEOWNERS applies.
+4. Try it once yourself before inviting anyone: open an existing page, save it without changes, and look at the commit on GitHub. Pages CMS rewrites Markdown when it saves, so check that the page still reads the same (see [Known limitations](#45-known-limitations)).
+
+### 4.4 Invite editors
+
+1. Open **Collaborators** and add each editor's email address. They get an email from Pages CMS with a **Join** link, and don't need a GitHub account.
+2. Tell each editor to **always select the `content` branch** before editing. Pages CMS opens the default branch, `main`, unless they switch. The [editor instructions](../CONTRIBUTING.md#3-web-editor) cover this.
+3. Their commits are credited to them by name (`settings.commit.identity: user`).
+
+To remove an editor, delete them from **Collaborators**.
+
+### 4.5 Known limitations
+
+- **Markdown may be reformatted on save.** The editor turns the page into rich text and back, so spacing, list markers, escaped characters, and raw HTML can change or disappear ([pages-cms#185](https://github.com/pages-cms/pages-cms/issues/185), [pages-cms#424](https://github.com/pages-cms/pages-cms/issues/424)). Reviewers should check the diff and the preview.
+- **Images only.** Uploads are limited to PNG, JPEG, WebP, AVIF, and GIF, saved in `src/content/docs/<topic>/images/`.
+- **No MDX.** `.mdx` pages (such as the home page) don't appear in the editor and can't be created there.
+- **New topics need a config change.** Each topic has its own collection in `.pages.yml`.
+
+### 4.6 The content pull request
+
+1. Each time the `content` pull request is opened, a maintainer may need to select **Approve workflows to run** on it. After that, CI runs on every save. This happens because GitHub holds the first run on pull requests opened by a workflow.
    - To avoid the click, a GitHub App could open the pull request instead of the workflow's own token. That means an app to create and a private key to keep as a secret, so it isn't set up.
-3. After a merge, the workflow updates `content` from `main`. Editors always keep their saves. If an update fails because the same lines changed on both branches, a developer fixes it:
+2. After a merge, the workflow updates `content` from `main`. Editors always keep their saves. If an update fails because the same lines changed on both branches, a developer fixes it:
 
    ```sh
    git fetch origin
@@ -118,7 +155,10 @@ Previews only work once the Worker exists and `preview.yml` is on `main`. To che
 Once CI has run at least once, so the checks appear in the picker, add a branch ruleset for `main` (**Settings → Rules → Rulesets**):
 
 - Require a pull request with at least one approval.
+- Require review from Code Owners. [`.github/CODEOWNERS`](../.github/CODEOWNERS) lists the files that need the owner's approval: workflows, `.pages.yml`, dependencies, build config, site code, and `.mdx` pages. Markdown pages and images in the content folder can be approved by any reviewer.
 - Require these status checks to pass: **`Verify`** and **`Build preview`** (from the `CI` workflow).
 - No bypass for the Pages CMS app.
+
+GitHub doesn't let authors approve their own pull requests. While `@lstellway` is the only code owner, their own pull requests that touch owned files can't get an owner approval. Either add a second code owner, or add the repository admin role to the ruleset's bypass list with **For pull requests only**, so the admin can merge their own pull requests but still can't push to `main` directly.
 
 If a job in `ci.yml` is renamed, update the required checks to match.
