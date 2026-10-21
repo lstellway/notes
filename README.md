@@ -40,14 +40,15 @@ Temporary home: `guides.stellway.me`
 |---|---|
 | Content format | Markdown / MDX in git |
 | Site framework | [Astro](https://astro.build) with [Starlight](https://starlight.astro.build), which provides the docs layout, search, drafts, and MDX. Interactive components use [Preact](https://preactjs.com) (React-style code, small download, official Astro integration). |
-| Build and deploy | GitHub Actions builds, checks, and deploys. Cloudflare hosts. Actions makes a full clone, so git-based page dates are correct (Cloudflare's own builder makes a shallow clone). |
-| Hosting | Cloudflare, on a custom domain (`guides.stellway.me` for now) |
-| Infrastructure as code | Not yet. Worker settings will live in the repo (`wrangler.jsonc`), and one-time setup steps will be documented in `docs/setup.md`. Revisit when we add more Cloudflare resources or more admins. |
-| Previews | One per pull request. Public, but hidden from search engines. |
+| Build and deploy | GitHub Actions builds, checks, and deploys. Cloudflare hosts. Actions makes a full clone, so git-based page dates are correct (Cloudflare's own builder makes a shallow clone). Workflows: `CI` (checks and a preview build for every pull request), `Preview`, `Deploy`, and `Content branch`. See [docs/setup.md](docs/setup.md). |
+| Hosting | A Cloudflare Worker that serves the built files as static assets, with no server code, on a custom domain (`guides.stellway.me` for now) |
+| Infrastructure as code | Not yet. Worker settings live in the repo ([`wrangler.jsonc`](wrangler.jsonc)), and one-time setup steps are in [docs/setup.md](docs/setup.md). Revisit when we add more Cloudflare resources or more admins. |
+| Previews | One per pull request, at `pr-<number>-guides.<subdomain>.workers.dev`. The `content` pull request always uses `content-guides.<subdomain>.workers.dev`. Public, but hidden from search engines (robots meta tag and `X-Robots-Tag` header). The deploy runs `main`'s copy of the workflow, so pull request code never runs next to the Cloudflare credentials. Fork pull requests get no preview. |
 | Review | Changes merge through pull requests with at least one approval. Checks must pass. |
 | Finance disclaimer | Every finance page shows a notice automatically: *"This guide is general education, not financial, tax, or legal advice. Rules and rates change. Last reviewed: {date}."* Finance pages must have a `reviewed` date. |
 | Web editor | Hosted [Pages CMS](https://pagescms.org). Collaborators are invited by email and need no GitHub account. Edits are saved to a shared `content` branch, and one pull request from `content` to `main` collects them for review and preview. See [Security](#security). |
-| Deploy frequency | Production deploys only when `main` changes. Web-editor edits pile up on the `content` branch, so we control deploys by choosing when to merge it. |
+| Deploy frequency | Production deploys only when `main` changes, through a GitHub Environment limited to `main`. Several merges in a row collapse into one deploy. Web-editor edits pile up on the `content` branch, so we control deploys by choosing when to merge it. A workflow opens the `content` pull request and updates `content` from `main` after merges. |
+| Dependency updates | Dependabot, weekly and grouped, waiting a week after each release. It's built into GitHub, so no extra app gets write access. Actions are pinned to commit SHAs. |
 | Licensing | Code: MIT ([LICENSE](LICENSE)). Content: CC BY 4.0 ([LICENSE-CONTENT](LICENSE-CONTENT)). |
 
 ## Editing experience
@@ -104,7 +105,8 @@ Build notes for the deploy pipeline:
 
 - Production deploys run `pnpm build`. Previews run `pnpm build:preview`. Nothing else is needed to switch drafts and `noindex`.
 - Last-updated dates come from git, so the build needs a full clone (`fetch-depth: 0` in GitHub Actions).
-- For extra safety, previews can also send an `X-Robots-Tag: noindex` header.
+- Preview builds also write `dist/_headers`, which makes Cloudflare send `X-Robots-Tag: noindex` with every file. Production builds don't write it.
+- `pnpm exec wrangler deploy --dry-run` checks the Worker config against `dist/` without credentials. Real deploys happen only in GitHub Actions.
 
 ## Contributing
 

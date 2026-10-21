@@ -1,6 +1,6 @@
 # Contributing
 
-> **Draft:** The site builds locally, but pull request previews and the web editor are not set up yet.
+> **Draft:** Pull request previews and the web editor start working once the one-time setup in [docs/setup.md](docs/setup.md) is done.
 
 Contributions come from a trusted group of collaborators. Every change goes through a pull request and needs at least one approval before it is published.
 
