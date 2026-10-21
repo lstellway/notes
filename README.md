@@ -67,12 +67,12 @@ GitHub, not Pages CMS, is the security boundary. A 2026-10 review found that Pag
 
 1. **One repo only.** The Pages CMS GitHub App is installed on this repository only.
 2. **Protected `main`.** Changes need an approved pull request and passing checks. The app gets no exception.
-3. **Owners for sensitive files.** [CODEOWNERS](.github/CODEOWNERS) requires owner review for `.github/`, `.pages.yml`, dependencies, build config, site code under `src/`, and `.mdx` files. Markdown pages and images in the content folder can be approved by any reviewer.
+3. **Owners for sensitive files.** [CODEOWNERS](.github/CODEOWNERS) requires owner review for `.github/`, `.pages.yml`, `scripts/`, dependencies, build config, site code under `src/`, and `.mdx` files. Markdown pages and images in the content folder can be approved by any reviewer.
 4. **Secrets only on `main`.** Deploy secrets live in a GitHub Environment limited to `main`. Workflows on other branches get no secrets and read-only access.
 5. **No free-form workflow inputs.** No workflow accepts a `payload` input or puts inputs into shell commands.
-6. **Tight [`.pages.yml`](.pages.yml).** A unit test checks these rules.
-   - One content folder per topic (`src/content/docs/<topic>/`), with no subfolders.
-   - Raster image uploads only (PNG, JPEG, WebP, AVIF, GIF; no SVG or HTML), saved in the topic's `images/` folder.
+6. **Tight [`.pages.yml`](.pages.yml).** Generated from the section list (`pnpm cms:generate`). Unit tests check that it is up to date and follows these rules.
+   - One collection per editable section (such as `src/content/docs/finance/mortgages/`), limited to that folder. Editors can't create folders or rename pages, and each section's overview page can't be deleted.
+   - Raster image uploads only (PNG, JPEG, WebP, AVIF, GIF; no SVG or HTML), saved in the section's `images/` folder.
    - `.md` files, not `.mdx`.
    - No actions (buttons that start workflows), because Pages CMS doesn't check them on its server.
    - `settings.commit.identity: user`, so commits are credited to the real person.
@@ -100,6 +100,7 @@ Commands:
 | `pnpm dev` | Start the dev server at `http://localhost:4321`. Drafts are shown. |
 | `pnpm verify` | Run every check CI runs: types (`check`), lint and formatting (`lint`), unit tests (`test`), and the production build (`build`), which also fails on broken internal links or invalid frontmatter |
 | `pnpm format` | Fix formatting and import order |
+| `pnpm cms:generate` | Regenerate the web editor's config (`.pages.yml`) after changing the section list in `src/lib/sections.ts`. `pnpm test` fails if it is out of date. |
 | `pnpm build` | Build the public site into `dist/`. Drafts are left out. |
 | `pnpm build:preview` | Build a pull request preview (`astro build --mode preview`). Drafts are included, and every page gets a `noindex` robots tag. |
 

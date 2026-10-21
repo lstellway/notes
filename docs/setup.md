@@ -119,7 +119,7 @@ Once `.pages.yml` is on `main`, create the `content` branch from `main` (on GitH
 
 1. In Pages CMS, open `lstellway/notes`.
 2. Switch to the `content` branch with the branch menu.
-3. Check that **Finance guides**, **Finance overview**, and **Finance images** appear. The Settings page is hidden on purpose: `.pages.yml` is changed through pull requests, where CODEOWNERS applies.
+3. Check that one entry per editable section appears, such as **Finance › Mortgages** and **Finance › Mortgages › Overview**, plus **Finance › Overview**. The Settings page is hidden on purpose: `.pages.yml` is changed through pull requests, where CODEOWNERS applies.
 4. Try it once yourself before inviting anyone: open an existing page, save it without changes, and look at the commit on GitHub. Pages CMS rewrites Markdown when it saves, so check that the page still reads the same (see [Known limitations](#45-known-limitations)).
 
 ### 4.4 Invite editors
@@ -133,9 +133,9 @@ To remove an editor, delete them from **Collaborators**.
 ### 4.5 Known limitations
 
 - **Markdown may be reformatted on save.** The editor turns the page into rich text and back, so spacing, list markers, escaped characters, and raw HTML can change or disappear ([pages-cms#185](https://github.com/pages-cms/pages-cms/issues/185), [pages-cms#424](https://github.com/pages-cms/pages-cms/issues/424)). Reviewers should check the diff and the preview.
-- **Images only.** Uploads are limited to PNG, JPEG, WebP, AVIF, and GIF, saved in `src/content/docs/<topic>/images/`.
+- **Images only.** Uploads are limited to PNG, JPEG, WebP, AVIF, and GIF, saved in the section's `images/` folder, such as `src/content/docs/finance/mortgages/images/`.
 - **No MDX.** `.mdx` pages (such as the home page) don't appear in the editor and can't be created there.
-- **New topics need a config change.** Each topic has its own collection in `.pages.yml`.
+- **New sections need a code change.** `.pages.yml` is generated from the section list in `src/lib/sections.ts`. Add the section there and run `pnpm cms:generate` (see [Adding a section](../CONTRIBUTING.md#adding-a-section)). Editors can't create folders.
 
 ### 4.6 The content pull request
 
@@ -155,7 +155,7 @@ To remove an editor, delete them from **Collaborators**.
 Once CI has run at least once, so the checks appear in the picker, add a branch ruleset for `main` (**Settings → Rules → Rulesets**):
 
 - Require a pull request with at least one approval.
-- Require review from Code Owners. [`.github/CODEOWNERS`](../.github/CODEOWNERS) lists the files that need the owner's approval: workflows, `.pages.yml`, dependencies, build config, site code, and `.mdx` pages. Markdown pages and images in the content folder can be approved by any reviewer.
+- Require review from Code Owners. [`.github/CODEOWNERS`](../.github/CODEOWNERS) lists the files that need the owner's approval: workflows, `.pages.yml` and its generator script, dependencies, build config, site code, and `.mdx` pages. Markdown pages and images in the content folder can be approved by any reviewer.
 - Require these status checks to pass: **`Verify`** and **`Build preview`** (from the `CI` workflow).
 - No bypass for the Pages CMS app.
 
