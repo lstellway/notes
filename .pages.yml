@@ -1,0 +1,120 @@
+# Pages CMS configuration (https://pagescms.org/docs/configuration/).
+#
+# Pages CMS doesn't enforce every setting on its server, so GitHub is the security
+# boundary (see "Security" in README.md). This file is still kept tight, and
+# src/lib/pages-cms-config.test.ts checks the rules below:
+#
+# - Content: one collection per topic, limited to `src/content/docs/<topic>/`, with no
+#   subfolders. Only `.md` files: Pages CMS lists and saves only files with the
+#   extension of `filename`, so `.mdx` files are never shown or written.
+# - Media: raster images only, stored next to the topic's pages so Astro optimizes them.
+# - No `actions` (buttons that start GitHub workflows). Pages CMS doesn't check them on
+#   its server.
+#
+# To add a topic, copy the finance media, collection, and overview entries, and change
+# the names and paths. Mark the fields in `topicRules` (src/lib/topics.ts) as required.
+
+media:
+  - name: finance-images
+    label: Finance images
+    input: src/content/docs/finance/images
+    # Relative to the pages in src/content/docs/finance/, so images are written as
+    # `./images/<file>`. Astro then optimizes them (files in `public/` are not).
+    output: ./images
+    extensions: [png, jpg, jpeg, webp, avif, gif]
+    # Lowercase, hyphenated file names (this also lowercases `.JPG`).
+    rename: safe
+
+# Field definitions shared by the entries below.
+components:
+  title:
+    label: Title
+    type: string
+    required: true
+  description:
+    label: Description
+    description: One sentence that sums up the page. Shown in search results.
+    type: text
+    required: true
+  tags:
+    label: Tags
+    type: string
+    list: true
+  draft:
+    label: Draft
+    description: Drafts appear in previews but not on the public site.
+    type: boolean
+  reviewed:
+    label: Last reviewed
+    description: The date you last checked this page for accuracy.
+    type: date
+  updated:
+    label: Last updated (override)
+    description: Leave empty. The site uses the date of the last change.
+    type: date
+  created:
+    label: Created
+    type: date
+  body:
+    label: Body
+    type: rich-text
+    options:
+      format: markdown
+
+content:
+  - name: finance
+    label: Finance guides
+    type: collection
+    path: src/content/docs/finance
+    # The page's title as a lowercase, hyphenated slug, e.g. `fixed-vs-adjustable-mortgages.md`.
+    filename: "{primary}.md"
+    # The overview page is edited as its own entry below, so it can't be deleted or renamed.
+    exclude: [index.md]
+    subfolders: false
+    operations:
+      # Renaming changes the page's address and breaks links to it.
+      rename: false
+    view:
+      primary: title
+      fields: [title, reviewed, draft]
+      sort: [title, reviewed]
+      default:
+        sort: title
+        order: asc
+    fields:
+      - { name: title, component: title }
+      - { name: description, component: description }
+      - { name: tags, component: tags }
+      - { name: draft, component: draft }
+      # Finance pages must have a `reviewed` date (see src/lib/topics.ts).
+      - { name: reviewed, component: reviewed, required: true }
+      - { name: updated, component: updated }
+      - { name: created, component: created }
+      - { name: body, component: body, options: { media: finance-images } }
+
+  - name: finance-overview
+    label: Finance overview
+    type: file
+    path: src/content/docs/finance/index.md
+    fields:
+      - { name: title, component: title }
+      - { name: description, component: description }
+      - { name: reviewed, component: reviewed, required: true }
+      - { name: updated, component: updated }
+      - { name: body, component: body, options: { media: finance-images } }
+
+settings:
+  # The Settings page edits this file. Change it in git, where CODEOWNERS applies.
+  # (This only hides the page. Pages CMS already lets only GitHub users save it.)
+  hide: true
+  content:
+    # Keep frontmatter fields that aren't in the form above (e.g. `sidebar`).
+    merge: true
+  commit:
+    # Credit commits to the editor instead of the Pages CMS app.
+    identity: user
+    templates:
+      create: "Create {path} by {userName} (via Pages CMS)"
+      update: "Update {path} by {userName} (via Pages CMS)"
+      delete: "Delete {path} by {userName} (via Pages CMS)"
+      rename: "Rename {oldPath} to {newPath} by {userName} (via Pages CMS)"
