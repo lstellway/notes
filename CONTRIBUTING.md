@@ -23,7 +23,11 @@ Work locally when you are adding interactive components or making changes across
 
 ### 3. Web editor
 
-Contributors who don't use GitHub can sign in to the site's web editor (details to come). Saving creates a pull request that is reviewed the same way. The web editor handles plain articles best. Articles that embed interactive components may need to be edited on GitHub or locally.
+Contributors who don't use GitHub can sign in to the site's web editor. The tool hasn't been chosen yet; see the README's open decisions. Saving creates a pull request that is reviewed the same way. The web editor handles plain articles best. Articles that embed interactive components may need to be edited on GitHub or locally.
+
+## Drafts
+
+Add `draft: true` to an article's frontmatter to merge it without publishing it. Drafts appear locally and in previews, but not on the public site. Remove the flag when the article is ready.
 
 ## Writing guidelines
 
@@ -33,7 +37,7 @@ Contributors who don't use GitHub can sign in to the site's web editor (details 
 - **Frontmatter:** include at least a `title` and a `description`. Tags are optional.
 - **Dates:** created and updated dates come from git. Add `created` or `updated` to the frontmatter only to override them, for example after moving a file.
 - **Sources:** cite sources for facts, figures, and anything time-sensitive.
-- **Finance content:** stick to general education. Avoid personalized advice, and note the date that rates, limits, or rules apply to.
+- **Finance content:** stick to general education. Avoid personalized advice, and note the date that rates, limits, or rules apply to. Every finance page must have a `reviewed` date in its frontmatter. The site shows the standard disclaimer automatically, so don't add your own.
 
 ## Interactive components
 
@@ -43,6 +47,15 @@ Components such as calculators live alongside the content. Each one should:
 - Explain its assumptions and inputs in plain language.
 - Work without JavaScript where practical, or show a clear message when it can't.
 
+## Licensing of contributions
+
+By contributing, you agree that your contributions are licensed under this project's licenses:
+
+- Code under the [MIT License](LICENSE).
+- Content under [CC BY 4.0](LICENSE-CONTENT).
+
+Only contribute material you wrote yourself or that is compatibly licensed, and credit the source in either case.
+
 ## Review checklist
 
 Reviewers check that:
@@ -50,4 +63,5 @@ Reviewers check that:
 - [ ] The content is accurate, sourced, and in the right topic folder.
 - [ ] The preview renders correctly, including diagrams, math, and components.
 - [ ] Links work.
+- [ ] Finance pages have an up-to-date `reviewed` date.
 - [ ] Titles and descriptions are clear.

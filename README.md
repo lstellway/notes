@@ -1,11 +1,15 @@
-# Notes
+# Guides
+
+> "Guides" is a working name. The final site name is still to be decided.
 
 A public knowledge base of practical guides, written and maintained by a trusted group of contributors. It starts with **finance** and will grow to cover other topics over time.
+
+Temporary home: `guides.stellway.me`
 
 ## Goals
 
 - **Useful to the public:** clear, accurate, well-organized guides that anyone can find and read.
-- **Easy to contribute to:** Markdown is the main format. Technical contributors use git, and others use a web editor.
+- **Easy to contribute to:** contributing should take as little effort as possible. Markdown is the main format, and non-technical contributors use a web editor.
 - **Interactive where it helps:** tools like calculators sit next to the writing that explains them.
 - **Durable and simple:** a static site, with all content in plain files under version control.
 
@@ -18,8 +22,10 @@ A public knowledge base of practical guides, written and maintained by a trusted
 - **Interactive tools:** components such as calculators (for example, a mortgage calculator). Each one can be its own page or embedded in an article.
 - **Search:** full-text search built into the site, with no server.
 - **Rich content:** Mermaid diagrams and LaTeX math.
+- **Drafts:** articles marked as drafts appear in previews but not on the public site.
 - **Dates:** created and updated dates come from git history. A file can set them in its frontmatter (the metadata block at the top) to override git.
 - **Review:** every change goes through a pull request and needs approval. Each pull request gets a preview deployment.
+- **Web editor:** non-technical contributors can edit in the browser from launch.
 
 ### Out of scope (for now)
 
@@ -28,23 +34,44 @@ A public knowledge base of practical guides, written and maintained by a trusted
 - A graph view of how notes connect
 - Multiple languages
 
-## Stack
+## Decisions
 
-| Concern | Choice |
+| Area | Decision |
 |---|---|
-| Framework | [Astro](https://astro.build) with [Starlight](https://starlight.astro.build) |
-| Content | Markdown / MDX in git |
-| Search | Pagefind (built into Starlight) |
-| Hosting | Cloudflare, on a custom domain |
-| Web editor | Git-backed CMS (likely [Keystatic](https://keystatic.com)), to be decided |
+| Content format | Markdown / MDX in git |
+| Build and deploy | GitHub Actions builds, checks, and deploys. Cloudflare hosts. Actions makes a full clone, so git-based page dates are correct (Cloudflare's own builder makes a shallow clone). |
+| Hosting | Cloudflare, on a custom domain (`guides.stellway.me` for now) |
+| Infrastructure as code | Not yet. Worker settings will live in the repo (`wrangler.jsonc`), and one-time setup steps will be documented in `docs/setup.md`. Revisit when we add more Cloudflare resources or more admins. |
+| Previews | One per pull request. Public, but hidden from search engines. |
+| Review | Changes merge through pull requests with at least one approval. Checks must pass. |
+| Finance disclaimer | Every finance page shows a notice automatically: *"This guide is general education, not financial, tax, or legal advice. Rules and rates change. Last reviewed: {date}."* Finance pages must have a `reviewed` date. |
+| Licensing | Code: MIT ([LICENSE](LICENSE)). Content: CC BY 4.0 ([LICENSE-CONTENT](LICENSE-CONTENT)). |
+
+## Editing experience
+
+There is no custom editor. All edits end in a reviewed pull request, whichever way they are made:
+
+| Who | How |
+|---|---|
+| Developers | Edit locally with a live dev server |
+| Comfortable with GitHub | "Edit this page" link → GitHub's web editor |
+| Non-technical | A git-backed web editor (CMS) with form fields and a word-processor-style editor (candidates below) |
 
 ## Open decisions
 
-1. **Web editor: Keystatic vs. Decap.**
-   - **Keystatic** is the nicer editor and fits Astro better, but its editor page runs as a small Cloudflare server function. The public site stays static.
-   - **Decap** is fully static but older and clunkier.
-   - Neither handles complex MDX components well, so articles that embed tools may still need a GitHub edit.
-2. **Finance disclaimers.** Decide whether finance pages carry a standard "not financial advice" notice and a "last reviewed" date.
+1. **Site framework.** The leading candidate is [Astro](https://astro.build) with [Starlight](https://starlight.astro.build), which provides docs layout, search, drafts, and MDX. Not decided, and it should be chosen together with the web editor.
+2. **Web editor (CMS).** This is needed at launch. Candidates to evaluate:
+   - **[Pages CMS](https://pagescms.org):** a hosted service, so the site stays fully static. Configured with a file in the repo.
+   - **[Keystatic](https://keystatic.com):** a more polished editor hosted on our site. Needs a small server function and a GitHub App.
+
+   Criteria to compare:
+   - how easy it is for non-technical contributors
+   - whether contributors need a GitHub account
+   - how it handles our frontmatter, images, and MDX
+   - whether it creates pull requests rather than committing directly
+   - setup and upkeep
+3. **Interactive component library.** Tentatively Preact (React-style code, small download, official Astro integration). It depends on the site framework.
+4. **Site name and domain.** "Guides" on `guides.stellway.me` for now.
 
 ## Contributing
 
@@ -52,4 +79,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-See [LICENSE](LICENSE).
+- **Code** (site source, components, scripts, configuration) is licensed under the [MIT License](LICENSE).
+- **Content** (articles, images, and other written or media content) is licensed under [Creative Commons Attribution 4.0 International](LICENSE-CONTENT) (CC BY 4.0).
