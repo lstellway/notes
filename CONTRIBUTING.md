@@ -31,10 +31,31 @@ Contributors who don't use GitHub are invited by email to [Pages CMS](https://pa
 
 Add `draft: true` to an article's frontmatter to merge it without publishing it. Drafts appear locally and in previews, but not on the public site. Remove the flag when the article is ready.
 
+## Adding a section
+
+Every folder of pages under `src/content/docs/` is a section, listed in `src/lib/sections.ts`. That list builds the sidebar, and the tests fail if a folder and the list don't match.
+
+1. Add an entry to `src/lib/sections.ts`, inside its parent section. For example, a Taxes section in Finance:
+
+   ```ts
+   {
+   	folder: "finance",
+   	label: "Finance",
+   	sections: [
+   		{ folder: "mortgages", label: "Mortgages" },
+   		{ folder: "taxes", label: "Taxes" },
+   		{ folder: "tools", label: "Tools" },
+   	],
+   },
+   ```
+
+2. Create the folder, `src/content/docs/finance/taxes/`, with an overview page, `index.md`, and link to it from the parent section's overview.
+
 ## Writing guidelines
 
 - **One topic per note.** Link to related notes instead of repeating them.
-- **File placement:** put notes in `src/content/docs/`, in the folder for their topic, such as `src/content/docs/finance/`. Use lowercase, hyphenated file names like `fixed-vs-adjustable-mortgages.md`. Pages in an existing folder appear in the sidebar automatically. A new folder needs a sidebar entry in `astro.config.ts`.
+- **File placement:** put notes in the folder for their section under `src/content/docs/`, such as `src/content/docs/finance/mortgages/`. Use lowercase, hyphenated file names like `fixed-vs-adjustable-mortgages.md`. Pages appear in their section's sidebar group automatically, ordered by `sidebar.order` and then by title.
+- **Sections:** topics (like `finance/`) are split into section folders (like `finance/mortgages/`), which can have their own subsections. A section with subsections holds only its overview page (`index.md`); its other pages go in a subsection. See [Adding a section](#adding-a-section).
 - **Links:** link to other notes with their path on the site, starting with `/`, like `[Mortgages](/finance/mortgages/)`. The build fails if a link points to a page that doesn't exist.
 - **Frontmatter:** include at least a `title` and a `description`. Tags are optional.
 - **Dates:** the "Last updated" date on each page comes from git. Add `updated` to the frontmatter only to override it, for example after moving a file. `created` is optional and isn't shown on pages yet.
