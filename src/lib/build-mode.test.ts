@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isPreviewBuild, robotsTxt } from "./build-mode";
+import { cloudflareHeaders, isPreviewBuild, robotsTxt } from "./build-mode";
 
 describe("isPreviewBuild", () => {
 	it("is true only in preview mode", () => {
@@ -22,5 +22,17 @@ describe("robotsTxt", () => {
 		const text = robotsTxt({ preview: true, site });
 		expect(text).not.toContain("Sitemap");
 		expect(text).not.toContain("Disallow");
+	});
+});
+
+describe("cloudflareHeaders", () => {
+	it("sends a noindex header on every file in previews", () => {
+		expect(cloudflareHeaders({ preview: true })).toMatch(
+			/^\/\*\n {2}X-Robots-Tag: noindex, nofollow$/m,
+		);
+	});
+
+	it("writes no headers file in production", () => {
+		expect(cloudflareHeaders({ preview: false })).toBeUndefined();
 	});
 });
