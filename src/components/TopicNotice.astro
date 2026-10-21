@@ -1,0 +1,30 @@
+---
+/**
+ * Shows the notice for the current page's topic, if its topic has one.
+ * Topics and their notices are configured in `src/lib/topics.ts`.
+ */
+import { findTopicRule } from "../lib/topics";
+
+const { entry } = Astro.locals.starlightRoute;
+const notice = findTopicRule(entry.filePath)?.notice;
+const text = notice?.text(entry.data);
+---
+
+{
+	notice && text && (
+		<aside class="topic-notice" aria-label={notice.label} data-pagefind-ignore>
+			<p>{text}</p>
+		</aside>
+	)
+}
+
+<style>
+	.topic-notice {
+		margin-block-end: 1.5rem;
+		padding: 0.75rem 1rem;
+		border-inline-start: 0.25rem solid var(--sl-color-blue);
+		background-color: var(--sl-color-blue-low);
+		color: var(--sl-color-white);
+		font-size: var(--sl-text-body-sm);
+	}
+</style>

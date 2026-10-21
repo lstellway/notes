@@ -1,11 +1,15 @@
 ---
 /**
- * Override of Starlight's MarkdownContent: adds the script that renders
- * Mermaid diagrams.
+ * Override of Starlight's MarkdownContent: adds the topic notice above every
+ * page's content, and the script that renders Mermaid diagrams.
+ * MarkdownContent renders on every page template (doc and splash, with or
+ * without a hero), so the notice can't be skipped by changing the layout.
  */
 import Default from "@astrojs/starlight/components/MarkdownContent.astro";
+import TopicNotice from "./TopicNotice.astro";
 ---
 
+<TopicNotice />
 <Default {...Astro.props}><slot /></Default>
 
 <script>
