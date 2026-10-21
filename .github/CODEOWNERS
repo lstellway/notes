@@ -9,8 +9,9 @@
 # Workflows, actions, Dependabot, and this file.
 /.github/ @lstellway
 
-# Web editor config.
+# Web editor config (generated from src/lib/sections.ts) and its generator script.
 /.pages.yml @lstellway
+/scripts/ @lstellway
 
 # Dependencies, build, and hosting config.
 /package.json @lstellway

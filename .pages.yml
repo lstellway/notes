@@ -1,31 +1,38 @@
 # Pages CMS configuration (https://pagescms.org/docs/configuration/).
 #
+# GENERATED FILE: don't edit. It is built from the section list in src/lib/sections.ts
+# by src/lib/pages-cms.ts. Run `pnpm cms:generate` after changing either one; a test
+# fails when this file is out of date.
+#
 # Pages CMS doesn't enforce every setting on its server, so GitHub is the security
 # boundary (see "Security" in README.md). This file is still kept tight, and
 # src/lib/pages-cms-config.test.ts checks the rules below:
 #
-# - Content: one collection per topic, limited to `src/content/docs/<topic>/`, with no
-#   subfolders. Only `.md` files: Pages CMS lists and saves only files with the
-#   extension of `filename`, so `.mdx` files are never shown or written.
-# - Media: raster images only, stored next to the topic's pages so Astro optimizes them.
+# - Content: each editable section has an "Overview" entry for its index.md, which
+#   can't be deleted or renamed. A section without subsections also has a collection
+#   for its other pages, limited to its own folder (no subfolders, no renaming).
+#   Only `.md` files: Pages CMS lists and saves only files with the extension of
+#   `filename`, so `.mdx` files are never shown or written.
+# - Media: raster images only, stored in each section's `images/` folder, next to its
+#   pages, so Astro optimizes them.
+# - Fields: shared definitions in `components`. Fields listed in `topicRules`
+#   (src/lib/topics.ts) are required.
 # - No `actions` (buttons that start GitHub workflows). Pages CMS doesn't check them on
 #   its server.
-#
-# To add a topic, copy the finance media, collection, and overview entries, and change
-# the names and paths. Mark the fields in `topicRules` (src/lib/topics.ts) as required.
 
 media:
-  - name: finance-images
+  - name: finance__images
     label: Finance images
     input: src/content/docs/finance/images
-    # Relative to the pages in src/content/docs/finance/, so images are written as
-    # `./images/<file>`. Astro then optimizes them (files in `public/` are not).
     output: ./images
     extensions: [png, jpg, jpeg, webp, avif, gif]
-    # Lowercase, hyphenated file names (this also lowercases `.JPG`).
     rename: safe
-
-# Field definitions shared by the entries below.
+  - name: finance_mortgages__images
+    label: Finance › Mortgages images
+    input: src/content/docs/finance/mortgages/images
+    output: ./images
+    extensions: [png, jpg, jpeg, webp, avif, gif]
+    rename: safe
 components:
   title:
     label: Title
@@ -60,19 +67,26 @@ components:
     type: rich-text
     options:
       format: markdown
-
 content:
-  - name: finance
-    label: Finance guides
+  - name: finance__overview
+    label: Finance › Overview
+    type: file
+    path: src/content/docs/finance/index.md
+    fields:
+      - {name: title, component: title}
+      - {name: description, component: description}
+      - {name: tags, component: tags}
+      - {name: reviewed, component: reviewed, required: true}
+      - {name: updated, component: updated}
+      - {name: body, component: body, options: {media: finance__images}}
+  - name: finance_mortgages
+    label: Finance › Mortgages
     type: collection
-    path: src/content/docs/finance
-    # The page's title as a lowercase, hyphenated slug, e.g. `fixed-vs-adjustable-mortgages.md`.
+    path: src/content/docs/finance/mortgages
     filename: "{primary}.md"
-    # The overview page is edited as its own entry below, so it can't be deleted or renamed.
     exclude: [index.md]
     subfolders: false
     operations:
-      # Renaming changes the page's address and breaks links to it.
       rename: false
     view:
       primary: title
@@ -82,39 +96,33 @@ content:
         sort: title
         order: asc
     fields:
-      - { name: title, component: title }
-      - { name: description, component: description }
-      - { name: tags, component: tags }
-      - { name: draft, component: draft }
-      # Finance pages must have a `reviewed` date (see src/lib/topics.ts).
-      - { name: reviewed, component: reviewed, required: true }
-      - { name: updated, component: updated }
-      - { name: created, component: created }
-      - { name: body, component: body, options: { media: finance-images } }
-
-  - name: finance-overview
-    label: Finance overview
+      - {name: title, component: title}
+      - {name: description, component: description}
+      - {name: tags, component: tags}
+      - {name: draft, component: draft}
+      - {name: reviewed, component: reviewed, required: true}
+      - {name: updated, component: updated}
+      - {name: created, component: created}
+      - {name: body, component: body, options: {media: finance_mortgages__images}}
+  - name: finance_mortgages__overview
+    label: Finance › Mortgages › Overview
     type: file
-    path: src/content/docs/finance/index.md
+    path: src/content/docs/finance/mortgages/index.md
     fields:
-      - { name: title, component: title }
-      - { name: description, component: description }
-      - { name: reviewed, component: reviewed, required: true }
-      - { name: updated, component: updated }
-      - { name: body, component: body, options: { media: finance-images } }
-
+      - {name: title, component: title}
+      - {name: description, component: description}
+      - {name: tags, component: tags}
+      - {name: reviewed, component: reviewed, required: true}
+      - {name: updated, component: updated}
+      - {name: body, component: body, options: {media: finance_mortgages__images}}
 settings:
-  # The Settings page edits this file. Change it in git, where CODEOWNERS applies.
-  # (This only hides the page. Pages CMS already lets only GitHub users save it.)
   hide: true
   content:
-    # Keep frontmatter fields that aren't in the form above (e.g. `sidebar`).
     merge: true
   commit:
-    # Credit commits to the editor instead of the Pages CMS app.
     identity: user
     templates:
-      create: "Create {path} by {userName} (via Pages CMS)"
-      update: "Update {path} by {userName} (via Pages CMS)"
-      delete: "Delete {path} by {userName} (via Pages CMS)"
-      rename: "Rename {oldPath} to {newPath} by {userName} (via Pages CMS)"
+      create: Create {path} by {userName} (via Pages CMS)
+      update: Update {path} by {userName} (via Pages CMS)
+      delete: Delete {path} by {userName} (via Pages CMS)
+      rename: Rename {oldPath} to {newPath} by {userName} (via Pages CMS)

@@ -15,6 +15,7 @@
 		"lint": "biome check .",
 		"format": "biome check --write .",
 		"test": "vitest run",
+		"cms:generate": "node scripts/cms-generate.ts",
 		"verify": "pnpm check && pnpm lint && pnpm test && pnpm build"
 	},
 	"dependencies": {
