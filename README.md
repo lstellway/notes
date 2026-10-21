@@ -23,7 +23,7 @@ Temporary home: `guides.stellway.me`
 - **Search:** full-text search built into the site, with no server.
 - **Rich content:** Mermaid diagrams and LaTeX math.
 - **Drafts:** articles marked as drafts appear in previews but not on the public site.
-- **Dates:** created and updated dates come from git history. A file can set them in its frontmatter (the metadata block at the top) to override git.
+- **Dates:** the updated date comes from git history. A file can set `updated` in its frontmatter (the metadata block at the top) to override git. `created` is an optional frontmatter field.
 - **Review:** every change goes through a pull request and needs approval. Each pull request gets a preview deployment.
 - **Web editor:** non-technical contributors can edit in the browser from launch.
 
@@ -39,6 +39,7 @@ Temporary home: `guides.stellway.me`
 | Area | Decision |
 |---|---|
 | Content format | Markdown / MDX in git |
+| Site framework | [Astro](https://astro.build) with [Starlight](https://starlight.astro.build), which provides the docs layout, search, drafts, and MDX. Interactive components use [Preact](https://preactjs.com) (React-style code, small download, official Astro integration). |
 | Build and deploy | GitHub Actions builds, checks, and deploys. Cloudflare hosts. Actions makes a full clone, so git-based page dates are correct (Cloudflare's own builder makes a shallow clone). |
 | Hosting | Cloudflare, on a custom domain (`guides.stellway.me` for now) |
 | Infrastructure as code | Not yet. Worker settings will live in the repo (`wrangler.jsonc`), and one-time setup steps will be documented in `docs/setup.md`. Revisit when we add more Cloudflare resources or more admins. |
@@ -56,7 +57,7 @@ We don't build a custom editor. All edits end in a reviewed pull request, whiche
 | Who | How |
 |---|---|
 | Developers | Edit locally with a live dev server |
-| Comfortable with GitHub | "Edit this page" link → GitHub's web editor |
+| Comfortable with GitHub | "Edit page" link → GitHub's web editor |
 | Non-technical | Pages CMS: form fields plus a word-processor-style editor, saving to the `content` branch |
 
 ## Security
@@ -73,15 +74,37 @@ GitHub, not Pages CMS, is the security boundary. A 2026-10 review found that Pag
    - Image-only uploads (no SVG or HTML).
    - `.md` files, not `.mdx`.
    - `settings.commit.identity: user`, so commits are credited to the real person.
-7. **HTML cleanup.** The site build strips or sanitizes raw HTML in Markdown.
+7. **HTML cleanup.** The site build removes raw HTML from `.md` files, drops unsafe links such as `javascript:`, and rejects frontmatter fields that would add raw HTML to a page. `.mdx` files can contain code, so they are reviewed as code.
 
 Revisit hosting when the Pages CMS rewrite ships. It fixes several of these issues and adds self-hosting on Cloudflare.
 
 ## Open decisions
 
-1. **Site framework.** The leading candidate is [Astro](https://astro.build) with [Starlight](https://starlight.astro.build), which provides docs layout, search, drafts, and MDX. Not decided. Pages CMS works with any framework that reads Markdown files.
-2. **Interactive component library.** Tentatively Preact (React-style code, small download, official Astro integration). It depends on the site framework.
-3. **Site name and domain.** "Guides" on `guides.stellway.me` for now.
+1. **Site name and domain.** "Guides" on `guides.stellway.me` for now.
+
+## Development
+
+Prerequisites:
+
+- Node.js, at the version in [`.node-version`](.node-version) (the current LTS).
+- [pnpm](https://pnpm.io/installation). The version is pinned in `package.json`, and pnpm switches to it automatically.
+
+Commands:
+
+| Command | What it does |
+|---|---|
+| `pnpm install` | Install dependencies |
+| `pnpm dev` | Start the dev server at `http://localhost:4321`. Drafts are shown. |
+| `pnpm verify` | Run every check CI runs: types (`check`), lint and formatting (`lint`), unit tests (`test`), and the production build (`build`), which also fails on broken internal links or invalid frontmatter |
+| `pnpm format` | Fix formatting and import order |
+| `pnpm build` | Build the public site into `dist/`. Drafts are left out. |
+| `pnpm build:preview` | Build a pull request preview (`astro build --mode preview`). Drafts are included, and every page gets a `noindex` robots tag. |
+
+Build notes for the deploy pipeline:
+
+- Production deploys run `pnpm build`. Previews run `pnpm build:preview`. Nothing else is needed to switch drafts and `noindex`.
+- Last-updated dates come from git, so the build needs a full clone (`fetch-depth: 0` in GitHub Actions).
+- For extra safety, previews can also send an `X-Robots-Tag: noindex` header.
 
 ## Contributing
 
