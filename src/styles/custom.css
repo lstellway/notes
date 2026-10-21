@@ -1,0 +1,13 @@
+/* Mermaid diagrams: show the rendered SVG without code-block chrome. */
+.sl-markdown-content pre.mermaid {
+	padding: 0;
+	border: 0;
+	background: transparent;
+	text-align: center;
+}
+
+/* Wide display math scrolls instead of overflowing the page. */
+.sl-markdown-content .katex-display {
+	overflow-x: auto;
+	overflow-y: hidden;
+}

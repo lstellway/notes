@@ -1,0 +1,13 @@
+---
+/**
+ * Override of Starlight's MarkdownContent: adds the script that renders
+ * Mermaid diagrams.
+ */
+import Default from "@astrojs/starlight/components/MarkdownContent.astro";
+---
+
+<Default {...Astro.props}><slot /></Default>
+
+<script>
+	import "../scripts/mermaid";
+</script>
