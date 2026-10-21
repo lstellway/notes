@@ -1,6 +1,6 @@
 # Contributing
 
-> **Draft:** The site and tooling are not set up yet. This describes the intended workflow.
+> **Draft:** The site builds locally, but pull request previews and the web editor are not set up yet.
 
 Contributions come from a trusted group of collaborators. Every change goes through a pull request and needs at least one approval before it is published.
 
@@ -8,16 +8,18 @@ Contributions come from a trusted group of collaborators. Every change goes thro
 
 ### 1. On GitHub (recommended for most edits)
 
-1. Open the page on the site and click **Edit this page**. GitHub's web editor opens.
+1. Open the page on the site and click **Edit page**. GitHub's web editor opens.
 2. Make your changes and choose **Propose changes**. This creates a branch and a pull request.
 3. Check the preview link posted on the pull request.
 4. A reviewer approves and merges, and the site updates automatically.
 
 ### 2. Locally
 
-1. Clone the repository and create a branch.
-2. Install dependencies and run the dev server (commands will be listed here once the site exists).
-3. Commit, push, and open a pull request.
+1. Install Node.js (the version in `.node-version`) and [pnpm](https://pnpm.io/installation).
+2. Clone the repository and create a branch.
+3. Run `pnpm install`, then `pnpm dev` to start the dev server at `http://localhost:4321`. Pages reload as you edit.
+4. Run `pnpm verify` to run the same checks as CI. `pnpm format` fixes formatting.
+5. Commit, push, and open a pull request.
 
 Work locally when you are adding interactive components or making changes across many files.
 
@@ -32,12 +34,44 @@ Add `draft: true` to an article's frontmatter to merge it without publishing it.
 ## Writing guidelines
 
 - **One topic per note.** Link to related notes instead of repeating them.
-- **File placement:** put notes in the folder for their topic, such as `finance/`. Use lowercase, hyphenated file names like `fixed-vs-adjustable-mortgages.md`.
-- **Links:** link to other notes with relative links.
+- **File placement:** put notes in `src/content/docs/`, in the folder for their topic, such as `src/content/docs/finance/`. Use lowercase, hyphenated file names like `fixed-vs-adjustable-mortgages.md`.
+- **Links:** link to other notes with their path on the site, starting with `/`, like `[Mortgages](/finance/mortgages/)`. The build fails if a link points to a page that doesn't exist.
 - **Frontmatter:** include at least a `title` and a `description`. Tags are optional.
-- **Dates:** created and updated dates come from git. Add `created` or `updated` to the frontmatter only to override them, for example after moving a file.
+- **Dates:** the "Last updated" date on each page comes from git. Add `updated` to the frontmatter only to override it, for example after moving a file. `created` is optional and isn't shown on pages yet.
 - **Sources:** cite sources for facts, figures, and anything time-sensitive.
-- **Finance content:** stick to general education. Avoid personalized advice, and note the date that rates, limits, or rules apply to. Every finance page must have a `reviewed` date in its frontmatter. The site shows the standard disclaimer automatically, so don't add your own.
+- **Finance content:** stick to general education. Avoid personalized advice, and note the date that rates, limits, or rules apply to. Every finance page must have a `reviewed` date in its frontmatter, or the build fails. The site shows the standard disclaimer automatically, so don't add your own.
+
+### Frontmatter fields
+
+```yaml
+---
+title: Fixed vs. adjustable mortgages
+description: How the two loan types differ and when each makes sense.
+tags: [mortgages, loans]
+reviewed: 2026-10-20 # required for finance pages
+updated: 2026-10-20 # optional, overrides the date from git
+created: 2026-09-01 # optional
+draft: true # optional, leaves the page off the public site
+---
+```
+
+Write dates as `YYYY-MM-DD`. Use `updated`, not Starlight's `lastUpdated`. Other [Starlight frontmatter fields](https://starlight.astro.build/reference/frontmatter/) also work, except the ones listed under [HTML](#html).
+
+### Formatting
+
+Pages are Markdown. The site also supports asides (`:::note`), math, and Mermaid diagrams. The formatting reference page ([source](src/content/docs/contributing/formatting.md), `/contributing/formatting/` on the site) shows each one with examples. Two things differ from some other sites:
+
+- **Math** goes between double dollar signs: `$$x^2$$`. A single `$` is plain text, so amounts like $100 are safe.
+- **Diagrams** go in a code block marked `mermaid`.
+
+### HTML
+
+Raw HTML is removed from `.md` files when the site builds (the build log names the file and line). This keeps the web editor from being used to add scripts or embeds. Use Markdown syntax instead. In `.md` files, the build also:
+
+- Removes links and images that use unsafe link types such as `javascript:` or `data:`. Allowed: `https:`, `http:`, `mailto:`, `tel:`, and links within the site.
+- Rejects the `head`, `banner`, `hero`, and `sidebar.attrs` frontmatter fields, which add raw HTML or attributes to a page.
+
+`.mdx` files can contain HTML and components, so they are reviewed as code.
 
 ## Interactive components
 

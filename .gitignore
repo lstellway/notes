@@ -1,0 +1,22 @@
+# Build output
+dist/
+
+# Generated types and content cache
+.astro/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Test coverage
+coverage/
+
+# OS files
+.DS_Store
