@@ -5,9 +5,9 @@ reviewed: 2026-10-20
 sidebar:
   label: Overview
   order: 0
+updated: 2026-10-21
 ---
-
-Practical guides to personal finance. They explain how things work in general terms and link to the sources behind the facts.
+Practical guides for personal finance. They explain how things work in general terms and link to the sources behind the facts.
 
 ## Topics
 
@@ -16,3 +16,4 @@ Practical guides to personal finance. They explain how things work in general te
 ## Tools
 
 - [Mortgage calculator](/finance/tools/mortgage-calculator/): estimate a monthly mortgage payment and see how the loan is paid down.
+
