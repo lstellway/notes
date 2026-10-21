@@ -1,0 +1,186 @@
+# Deploys a pull request's preview after the "CI" workflow has built it, then posts the
+# link as a single comment on the pull request that is updated on every push.
+#
+# Why a separate workflow: deploying needs Cloudflare credentials, and the "CI" workflow
+# runs code from the pull request. A `workflow_run` workflow always runs this file as it
+# is on `main`, so pull request code never runs next to the credentials. It only uploads
+# the files that "CI" built. This also lets the `preview` environment be limited to `main`.
+#
+# Previews:
+# - Pull request #12 → alias `pr-12`: https://pr-12-guides.<account>.workers.dev
+# - The `content` → `main` pull request (web editor) → alias `content`, a stable link.
+# - Pull requests from forks get checks but no preview.
+#
+# GitHub only runs `workflow_run` workflows that are on the default branch, so changes to
+# this file take effect after they merge.
+name: Preview
+
+on:
+  # zizmor: ignore[dangerous-triggers] Runs only trusted code from `main`; see above.
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions: {}
+
+concurrency:
+  # A newer commit on the same branch replaces an in-progress preview deploy.
+  group: preview-${{ github.event.workflow_run.head_repository.id }}-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+
+jobs:
+  find:
+    name: Find pull request
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion != 'cancelled' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      pull-requests: read # Find the pull request for the built commit.
+    outputs:
+      number: ${{ steps.find.outputs.number }}
+      alias: ${{ steps.find.outputs.alias }}
+    steps:
+      - name: Find the open pull request for this commit
+        id: find
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pulls = await github.paginate(github.rest.pulls.list, {
+              owner,
+              repo,
+              state: "open",
+              head: `${owner}:${process.env.HEAD_BRANCH}`,
+              per_page: 100,
+            });
+            // Only the pull request whose latest commit is the one CI just built.
+            const pr = pulls.find(
+              (p) => p.head.sha === process.env.HEAD_SHA && p.head.repo?.full_name === `${owner}/${repo}`,
+            );
+            if (!pr) {
+              core.notice("No open pull request has this commit as its latest. Nothing to preview.");
+              return;
+            }
+            core.setOutput("number", String(pr.number));
+            core.setOutput("alias", pr.head.ref === "content" ? "content" : `pr-${pr.number}`);
+
+  deploy:
+    name: Deploy preview
+    needs: find
+    if: needs.find.outputs.number != '' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment:
+      name: preview
+      url: ${{ steps.upload.outputs.url }}
+    permissions:
+      contents: read
+      actions: read # Download the site built by the "CI" run.
+    outputs:
+      url: ${{ steps.upload.outputs.url }}
+    steps:
+      - name: Check out main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up
+        uses: ./.github/actions/setup
+
+      - name: Download the preview site
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: preview-site
+          path: dist
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Upload preview version
+        id: upload
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: "false"
+          WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.json
+          ALIAS: ${{ needs.find.outputs.alias }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        # Uploads a new version without deploying it: production keeps serving its version.
+        run: |
+          pnpm exec wrangler versions upload --preview-alias "$ALIAS" --message "Preview of $HEAD_SHA"
+          url="$(jq -r 'select(.type == "version-upload") | .preview_alias_url // empty' "$WRANGLER_OUTPUT_FILE_PATH")"
+          case "$url" in
+            https://*.workers.dev) ;;
+            *) echo "::error::Wrangler did not report a preview URL."; exit 1 ;;
+          esac
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+
+  comment:
+    name: Comment on pull request
+    needs: [find, deploy]
+    if: ${{ !cancelled() && needs.find.outputs.number != '' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write # Post the preview comment.
+    steps:
+      - name: Post or update the preview comment
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          PR_NUMBER: ${{ needs.find.outputs.number }}
+          PREVIEW_URL: ${{ needs.deploy.outputs.url }}
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          CI_RUN_URL: ${{ github.event.workflow_run.html_url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          script: |
+            const marker = "<!-- preview-comment -->";
+            const env = process.env;
+            const { owner, repo } = context.repo;
+            const issue_number = Number(env.PR_NUMBER);
+            const commit = env.HEAD_SHA.slice(0, 7);
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find(
+              (c) => c.user?.login === "github-actions[bot]" && c.body?.includes(marker),
+            );
+            // Keep the last working link when this commit couldn't be previewed.
+            const lastUrl = existing?.body.match(
+              /<!-- preview-url: (https:\/\/[a-z0-9-]+\.[a-z0-9-]+\.workers\.dev\/?) -->/,
+            )?.[1];
+            const url = env.DEPLOY_RESULT === "success" ? env.PREVIEW_URL : lastUrl;
+
+            const lines = [marker];
+            if (url) lines.push(`<!-- preview-url: ${url} -->`);
+            if (env.DEPLOY_RESULT === "success") {
+              lines.push(
+                `**Preview:** ${url}`,
+                "",
+                `Built from ${commit}. Drafts are included. Search engines are told not to index it.`,
+              );
+            } else {
+              const reason =
+                env.DEPLOY_RESULT === "skipped"
+                  ? `Checks failed for ${commit}. [See the checks](${env.CI_RUN_URL}).`
+                  : `The preview deploy failed for ${commit}. [See the logs](${env.RUN_URL}).`;
+              lines.push("**Preview not updated.** " + reason);
+              if (url) lines.push("", `The earlier preview is still at ${url}`);
+            }
+            const body = lines.join("\n");
+
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
