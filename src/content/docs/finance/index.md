@@ -7,4 +7,12 @@ sidebar:
   order: 0
 ---
 
-**Placeholder:** an overview of the finance guides will go here once the first guides are published.
+Practical guides to personal finance. They explain how things work in general terms and link to the sources behind the facts.
+
+## Topics
+
+- [Mortgages](/finance/mortgages/): how home loans and their monthly payments work.
+
+## Tools
+
+- [Mortgage calculator](/finance/tools/mortgage-calculator/): estimate a monthly mortgage payment and see how the loan is paid down.

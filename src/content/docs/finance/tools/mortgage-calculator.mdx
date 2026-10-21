@@ -1,0 +1,29 @@
+---
+title: Mortgage calculator
+description: Estimate the monthly payment, total interest, and payoff time for a fixed-rate mortgage, including taxes, insurance, and extra payments.
+tags: [mortgages, calculator]
+reviewed: 2026-10-20
+---
+
+import MortgageCalculatorEmbed from "../../../../components/finance/MortgageCalculatorEmbed.astro";
+
+Estimate the monthly payment for a fixed-rate home loan in the United States. Change any value and the results update right away. Nothing you enter leaves your browser.
+
+<MortgageCalculatorEmbed />
+
+## How the calculator works
+
+- **Loan amount** is the home price minus the down payment.
+- **Principal and interest** uses the standard fixed-rate formula, with the yearly rate divided by 12 for each month. [How mortgage payments work](/finance/mortgages/how-mortgage-payments-work/) explains the formula with a worked example.
+- **Estimated monthly payment** adds any property tax, homeowners insurance, PMI, and HOA dues you enter. Property tax and insurance are entered per year and divided by 12. Costs you leave blank count as $0.
+- **Extra payments** go entirely toward principal every month, starting with the first payment. They shorten the loan but don't change the regular payment.
+- **Payoff date** appears if you enter the month of your first payment.
+
+## What it leaves out
+
+- **Rates and costs change.** The example values are illustrations, not current rates or typical costs. Use figures from your own loan offers, tax records, and insurance quotes.
+- **The interest rate is not the APR.** Enter the loan's interest rate. The APR also includes some fees, so it's usually higher.
+- **Closing costs, points, and fees** aren't included.
+- **Taxes, insurance, PMI, and HOA dues are treated as fixed.** In reality they can change every year, and PMI usually ends once you have enough equity.
+- **Adjustable-rate, interest-only, and balloon loans** work differently and aren't covered.
+- **Rounding:** the calculator works at full precision and rounds only when showing results. Lenders round each payment to the cent, so their figures may differ by a few cents.

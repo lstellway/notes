@@ -18,7 +18,7 @@ Temporary home: `guides.stellway.me`
 ### In scope
 
 - **Content:** Markdown and MDX files stored in this repository.
-- **Organization:** top-level topic folders (starting with `finance/`), with cross-links and tags between notes.
+- **Organization:** topic folders (starting with `finance/`) split into nested section folders (such as `finance/mortgages/`), with cross-links and tags between notes. The section list in `src/lib/sections.ts` builds the sidebar.
 - **Interactive tools:** components such as calculators (for example, a mortgage calculator). Each one can be its own page or embedded in an article.
 - **Search:** full-text search built into the site, with no server.
 - **Rich content:** Mermaid diagrams and LaTeX math.

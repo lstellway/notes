@@ -7,6 +7,7 @@ import remarkMath from "remark-math";
 import starlightLinksValidator from "starlight-links-validator";
 import { rehypeContentSafety } from "./src/lib/markdown/rehype-content-safety";
 import { remarkMermaid } from "./src/lib/markdown/remark-mermaid";
+import { buildSidebar } from "./src/lib/sections";
 
 export default defineConfig({
 	site: "https://guides.stellway.me",
@@ -35,10 +36,8 @@ export default defineConfig({
 				baseUrl: "https://github.com/lstellway/notes/edit/main/",
 			},
 			social: [{ icon: "github", label: "GitHub", href: "https://github.com/lstellway/notes" }],
-			sidebar: [
-				{ label: "Finance", items: [{ autogenerate: { directory: "finance" } }] },
-				{ label: "Contributing", items: [{ autogenerate: { directory: "contributing" } }] },
-			],
+			// Built from the section list in src/lib/sections.ts.
+			sidebar: buildSidebar(),
 			customCss: ["katex/dist/katex.min.css", "./src/styles/custom.css"],
 			components: {
 				MarkdownContent: "./src/components/MarkdownContent.astro",

@@ -1,0 +1,35 @@
+---
+/**
+ * The mortgage calculator, ready to drop into an `.mdx` page:
+ *
+ *   import MortgageCalculatorEmbed from "../../../../components/finance/MortgageCalculatorEmbed.astro";
+ *   <MortgageCalculatorEmbed />
+ *
+ * The calculator is rendered to HTML at build time with its example values, so
+ * it shows up even without JavaScript. It becomes interactive when it scrolls
+ * into view. Give each calculator on a page a different `idPrefix`.
+ */
+import MortgageCalculator from "./MortgageCalculator";
+
+interface Props {
+	idPrefix?: string;
+}
+
+const { idPrefix } = Astro.props;
+---
+
+<noscript>
+	<p class="mortgage-calculator-noscript">
+		This calculator needs JavaScript to update. The results below are for the example values shown.
+	</p>
+</noscript>
+<MortgageCalculator client:visible idPrefix={idPrefix} />
+
+<style>
+	.mortgage-calculator-noscript {
+		padding: 0.75rem 1rem;
+		border-inline-start: 0.25rem solid var(--sl-color-orange);
+		background-color: var(--sl-color-orange-low);
+		color: var(--sl-color-white);
+	}
+</style>
