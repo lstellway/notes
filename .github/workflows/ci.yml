@@ -1,0 +1,68 @@
+# Checks every pull request and builds its preview. No secrets: this runs code from the
+# pull request, including pull requests from forks.
+#
+# The job names ("Verify", "Build preview") are the required status checks. Renaming a
+# job means updating branch protection too (see docs/setup.md).
+#
+# The "Preview" workflow deploys the preview once this workflow finishes, so this file's
+# `name:` must stay "CI".
+name: CI
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  # A new push to a pull request cancels the checks for its previous commit.
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Full history, for each page's last-updated date.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up
+        uses: ./.github/actions/setup
+        with:
+          cache: "true"
+
+      - name: Types, lint, tests, and production build
+        run: pnpm verify
+
+  preview:
+    name: Build preview
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up
+        uses: ./.github/actions/setup
+        with:
+          cache: "true"
+
+      - name: Build preview (drafts included, noindex)
+        run: pnpm build:preview
+
+      - name: Save the built site
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: preview-site
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
