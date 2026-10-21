@@ -34,7 +34,7 @@ Add `draft: true` to an article's frontmatter to merge it without publishing it.
 ## Writing guidelines
 
 - **One topic per note.** Link to related notes instead of repeating them.
-- **File placement:** put notes in `src/content/docs/`, in the folder for their topic, such as `src/content/docs/finance/`. Use lowercase, hyphenated file names like `fixed-vs-adjustable-mortgages.md`.
+- **File placement:** put notes in `src/content/docs/`, in the folder for their topic, such as `src/content/docs/finance/`. Use lowercase, hyphenated file names like `fixed-vs-adjustable-mortgages.md`. Pages in an existing folder appear in the sidebar automatically. A new folder needs a sidebar entry in `astro.config.ts`.
 - **Links:** link to other notes with their path on the site, starting with `/`, like `[Mortgages](/finance/mortgages/)`. The build fails if a link points to a page that doesn't exist.
 - **Frontmatter:** include at least a `title` and a `description`. Tags are optional.
 - **Dates:** the "Last updated" date on each page comes from git. Add `updated` to the frontmatter only to override it, for example after moving a file. `created` is optional and isn't shown on pages yet.
