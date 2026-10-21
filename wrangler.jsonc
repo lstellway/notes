@@ -1,0 +1,21 @@
+// Cloudflare Worker that serves the built site. Static assets only: no Worker code runs.
+// Docs: https://developers.cloudflare.com/workers/wrangler/configuration/
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "guides",
+	"compatibility_date": "2026-10-12",
+	"assets": {
+		"directory": "./dist",
+		// Serve Starlight's `dist/404.html` with a 404 status for unknown paths.
+		"not_found_handling": "404-page",
+		// `/page/` serves `page/index.html`; `/page` redirects to `/page/`.
+		"html_handling": "auto-trailing-slash"
+	},
+	// Production is only served on the custom domain.
+	"routes": [{ "pattern": "guides.stellway.me", "custom_domain": true }],
+	// No production copy on `guides.<account>.workers.dev`.
+	"workers_dev": false,
+	// Pull request previews: `wrangler versions upload --preview-alias <alias>` serves an
+	// uploaded version at `<alias>-guides.<account>.workers.dev` without deploying it.
+	"preview_urls": true
+}

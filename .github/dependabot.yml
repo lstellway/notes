@@ -1,0 +1,34 @@
+# Weekly dependency updates, grouped to keep the number of pull requests low.
+# Docs: https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference
+version: 2
+
+updates:
+  # Actions used by workflows and by the shared setup action. Pinned to commit SHAs;
+  # Dependabot updates the SHA and the version comment together.
+  - package-ecosystem: github-actions
+    directories:
+      - /
+      - /.github/actions/*
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]
+
+  # npm packages, installed with pnpm.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    # Wait a week after a release before proposing it, so broken or malicious releases
+    # are usually caught and pulled first.
+    cooldown:
+      default-days: 7
+    groups:
+      # One pull request for all minor and patch updates.
+      minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
+      # Major updates come one per package, so each can be reviewed on its own.

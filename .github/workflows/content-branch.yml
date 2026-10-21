@@ -1,0 +1,115 @@
+# Keeps the web editor's `content` branch flowing into `main`:
+#
+# - Push to `content` (a Pages CMS save): open the `content` → `main` pull request if none
+#   is open.
+# - Push to `main`: if no `content` pull request is open, bring `content` up to date with
+#   `main`, so editors see the latest pages and the next pull request only shows new edits.
+#   While a `content` pull request is open, `content` is left alone.
+#
+# If the `content` branch doesn't exist, both jobs do nothing.
+#
+# The pull request is opened with GITHUB_TOKEN. GitHub then holds its first CI run until
+# someone with write access selects "Approve workflows to run" on the pull request. Later
+# Pages CMS saves run CI normally. See docs/setup.md for the alternatives.
+name: Content branch
+
+on:
+  push:
+    branches: [main, content]
+
+permissions: {}
+
+concurrency:
+  # One at a time, in order, so a sync and a pull request check never race.
+  group: content-branch
+  cancel-in-progress: false
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  REPO: ${{ github.repository }}
+  OWNER: ${{ github.repository_owner }}
+
+jobs:
+  sync:
+    name: Update content branch from main
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write # Update the `content` branch.
+      pull-requests: read # Look up the content pull request.
+    outputs:
+      has-changes: ${{ steps.sync.outputs.has-changes }}
+    steps:
+      - name: Merge main into content
+        id: sync
+        run: |
+          set -euo pipefail
+          exists="$(gh api "repos/$REPO/git/matching-refs/heads/content" --jq 'map(select(.ref == "refs/heads/content")) | length')"
+          if [ "$exists" = 0 ]; then
+            echo "No content branch. Nothing to do."
+            exit 0
+          fi
+          open="$(gh api "repos/$REPO/pulls?state=open&base=main&head=$OWNER:content" --jq 'length')"
+          if [ "$open" != 0 ]; then
+            echo "A content pull request is open. Leaving the content branch as it is."
+            exit 0
+          fi
+
+          # Fast-forward when `content` has nothing that `main` lacks. Otherwise merge.
+          if gh api --method PATCH "repos/$REPO/git/refs/heads/content" -f sha="$GITHUB_SHA" -F force=false --silent 2>/dev/null; then
+            echo "Fast-forwarded content to main."
+          elif gh api --method POST "repos/$REPO/merges" -f base=content -f head="$GITHUB_SHA" \
+              -f commit_message="Merge main into content" --silent; then
+            echo "Merged main into content."
+          else
+            echo "::error::Couldn't merge main into content, probably because the same lines changed on both. Merge main into content by hand and resolve the conflicts (see docs/setup.md)."
+            exit 1
+          fi
+
+          files="$(gh api "repos/$REPO/compare/main...content" --jq '.files | length')"
+          echo "has-changes=$([ "$files" != 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+  pull-request:
+    name: Open content pull request
+    needs: sync
+    # On `main`, only when `content` still has edits that `main` lacks after the update.
+    if: >-
+      !cancelled() && (
+        (github.ref == 'refs/heads/content' && !github.event.deleted) ||
+        needs.sync.outputs.has-changes == 'true'
+      )
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write # Open the pull request.
+    steps:
+      - name: Open the pull request if none is open
+        run: |
+          set -euo pipefail
+          exists="$(gh api "repos/$REPO/git/matching-refs/heads/content" --jq 'map(select(.ref == "refs/heads/content")) | length')"
+          if [ "$exists" = 0 ]; then
+            echo "No content branch. Nothing to do."
+            exit 0
+          fi
+          open="$(gh api "repos/$REPO/pulls?state=open&base=main&head=$OWNER:content" --jq 'length')"
+          if [ "$open" != 0 ]; then
+            echo "A content pull request is already open."
+            exit 0
+          fi
+          files="$(gh api "repos/$REPO/compare/main...content" --jq '.files | length')"
+          if [ "$files" = 0 ]; then
+            echo "The content branch has no changes that main lacks."
+            exit 0
+          fi
+
+          gh api --method POST "repos/$REPO/pulls" --silent \
+            -f base=main -f head=content \
+            -f title="Web editor changes" \
+            -f body="Edits saved in the web editor (Pages CMS) since the last merge. New saves are added to this pull request automatically.
+
+          **Reviewers:** a maintainer may need to select **Approve workflows to run** below before the checks and preview start. The preview link is posted as a comment.
+
+          Merging publishes these changes."
+          echo "Opened the content pull request."
