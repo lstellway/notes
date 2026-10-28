@@ -33,7 +33,7 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "0.9.11",
-		"@biomejs/biome": "2.5.15",
+		"@biomejs/biome": "2.6.1",
 		"@types/hast": "3.0.5",
 		"@types/mdast": "4.0.4",
 		"@types/node": "26.6.5",
@@ -45,7 +45,7 @@
 		"unified": "11.0.5",
 		"vfile": "6.0.3",
 		"vitest": "5.0.5",
-		"wrangler": "4.151.1",
+		"wrangler": "4.151.3",
 		"yaml": "2.9.1"
 	}
 }
