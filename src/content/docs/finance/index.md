@@ -1,7 +1,7 @@
 ---
 title: Finance
 description: Guides to personal finance.
-reviewed: 2026-10-20
+reviewed: 2026-11-10
 sidebar:
   label: Overview
   order: 0
@@ -11,7 +11,11 @@ Practical guides to personal finance. They explain how things work in general te
 
 ## Topics
 
+- [Banking](/finance/banking/): checking, savings, certificates of deposit (CDs), and money market accounts.
+- [Credit](/finance/credit/): credit cards, credit scores and reports, and personal loans.
+- [Investing](/finance/investing/): brokerage accounts, retirement accounts, and the basic types of investments.
 - [Mortgages](/finance/mortgages/): how home loans and their monthly payments work.
+- [Taxes](/finance/taxes/): income tax basics, filing, deductions and credits, and tax-advantaged accounts.
 
 ## Tools
 
