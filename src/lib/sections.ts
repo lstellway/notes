@@ -38,7 +38,11 @@ export const sections: readonly Section[] = [
 		label: "Finance",
 		editable: true,
 		sections: [
+			{ folder: "banking", label: "Banking", editable: true },
+			{ folder: "credit", label: "Credit", editable: true },
+			{ folder: "investing", label: "Investing", editable: true },
 			{ folder: "mortgages", label: "Mortgages", editable: true },
+			{ folder: "taxes", label: "Taxes", editable: true },
 			// Calculators are `.mdx` pages with interactive components, so they're edited as code.
 			{ folder: "tools", label: "Tools", editable: false },
 		],

@@ -49,7 +49,7 @@ Add `draft: true` to an article's frontmatter to merge it without publishing it.
 
 Every folder of pages under `src/content/docs/` is a section, listed in `src/lib/sections.ts`. That list builds the sidebar and the web editor's config (`.pages.yml`), and the tests fail if a folder and the list don't match. Web editors pick a section; they never create folders, so adding one is a code change.
 
-1. Add an entry to `src/lib/sections.ts`, inside its parent section. For example, a Taxes section in Finance:
+1. Add an entry to `src/lib/sections.ts`, inside its parent section. For example, an Insurance section in Finance:
 
    ```ts
    {
@@ -57,6 +57,10 @@ Every folder of pages under `src/content/docs/` is a section, listed in `src/lib
    	label: "Finance",
    	editable: true,
    	sections: [
+   		{ folder: "banking", label: "Banking", editable: true },
+   		{ folder: "credit", label: "Credit", editable: true },
+   		{ folder: "insurance", label: "Insurance", editable: true },
+   		{ folder: "investing", label: "Investing", editable: true },
    		{ folder: "mortgages", label: "Mortgages", editable: true },
    		{ folder: "taxes", label: "Taxes", editable: true },
    		{ folder: "tools", label: "Tools", editable: false },
@@ -66,8 +70,8 @@ Every folder of pages under `src/content/docs/` is a section, listed in `src/lib
 
    Set `editable: true` to let the web editor edit the section. Editable sections hold only `.md` pages.
 
-2. Create the folder, `src/content/docs/finance/taxes/`, with an overview page, `index.md`, and link to it from the parent section's overview.
-3. Run `pnpm cms:generate` to update `.pages.yml`, and commit it. The web editor then shows **Finance › Taxes** and **Finance › Taxes › Overview**, with uploads going to `src/content/docs/finance/taxes/images/`.
+2. Create the folder, `src/content/docs/finance/insurance/`, with an overview page, `index.md`, and link to it from the parent section's overview.
+3. Run `pnpm cms:generate` to update `.pages.yml`, and commit it. The web editor then shows **Finance › Insurance** and **Finance › Insurance › Overview**, with uploads going to `src/content/docs/finance/insurance/images/`.
 
 ## Writing guidelines
 
