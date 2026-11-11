@@ -27,9 +27,33 @@ media:
     output: ./images
     extensions: [png, jpg, jpeg, webp, avif, gif]
     rename: safe
+  - name: finance_banking__images
+    label: Finance › Banking images
+    input: src/content/docs/finance/banking/images
+    output: ./images
+    extensions: [png, jpg, jpeg, webp, avif, gif]
+    rename: safe
+  - name: finance_credit__images
+    label: Finance › Credit images
+    input: src/content/docs/finance/credit/images
+    output: ./images
+    extensions: [png, jpg, jpeg, webp, avif, gif]
+    rename: safe
+  - name: finance_investing__images
+    label: Finance › Investing images
+    input: src/content/docs/finance/investing/images
+    output: ./images
+    extensions: [png, jpg, jpeg, webp, avif, gif]
+    rename: safe
   - name: finance_mortgages__images
     label: Finance › Mortgages images
     input: src/content/docs/finance/mortgages/images
+    output: ./images
+    extensions: [png, jpg, jpeg, webp, avif, gif]
+    rename: safe
+  - name: finance_taxes__images
+    label: Finance › Taxes images
+    input: src/content/docs/finance/taxes/images
     output: ./images
     extensions: [png, jpg, jpeg, webp, avif, gif]
     rename: safe
@@ -79,6 +103,114 @@ content:
       - {name: reviewed, component: reviewed, required: true}
       - {name: updated, component: updated}
       - {name: body, component: body, options: {media: finance__images}}
+  - name: finance_banking
+    label: Finance › Banking
+    type: collection
+    path: src/content/docs/finance/banking
+    filename: "{primary}.md"
+    exclude: [index.md]
+    subfolders: false
+    operations:
+      rename: false
+    view:
+      primary: title
+      fields: [title, reviewed, draft]
+      sort: [title, reviewed]
+      default:
+        sort: title
+        order: asc
+    fields:
+      - {name: title, component: title}
+      - {name: description, component: description}
+      - {name: tags, component: tags}
+      - {name: draft, component: draft}
+      - {name: reviewed, component: reviewed, required: true}
+      - {name: updated, component: updated}
+      - {name: created, component: created}
+      - {name: body, component: body, options: {media: finance_banking__images}}
+  - name: finance_banking__overview
+    label: Finance › Banking › Overview
+    type: file
+    path: src/content/docs/finance/banking/index.md
+    fields:
+      - {name: title, component: title}
+      - {name: description, component: description}
+      - {name: tags, component: tags}
+      - {name: reviewed, component: reviewed, required: true}
+      - {name: updated, component: updated}
+      - {name: body, component: body, options: {media: finance_banking__images}}
+  - name: finance_credit
+    label: Finance › Credit
+    type: collection
+    path: src/content/docs/finance/credit
+    filename: "{primary}.md"
+    exclude: [index.md]
+    subfolders: false
+    operations:
+      rename: false
+    view:
+      primary: title
+      fields: [title, reviewed, draft]
+      sort: [title, reviewed]
+      default:
+        sort: title
+        order: asc
+    fields:
+      - {name: title, component: title}
+      - {name: description, component: description}
+      - {name: tags, component: tags}
+      - {name: draft, component: draft}
+      - {name: reviewed, component: reviewed, required: true}
+      - {name: updated, component: updated}
+      - {name: created, component: created}
+      - {name: body, component: body, options: {media: finance_credit__images}}
+  - name: finance_credit__overview
+    label: Finance › Credit › Overview
+    type: file
+    path: src/content/docs/finance/credit/index.md
+    fields:
+      - {name: title, component: title}
+      - {name: description, component: description}
+      - {name: tags, component: tags}
+      - {name: reviewed, component: reviewed, required: true}
+      - {name: updated, component: updated}
+      - {name: body, component: body, options: {media: finance_credit__images}}
+  - name: finance_investing
+    label: Finance › Investing
+    type: collection
+    path: src/content/docs/finance/investing
+    filename: "{primary}.md"
+    exclude: [index.md]
+    subfolders: false
+    operations:
+      rename: false
+    view:
+      primary: title
+      fields: [title, reviewed, draft]
+      sort: [title, reviewed]
+      default:
+        sort: title
+        order: asc
+    fields:
+      - {name: title, component: title}
+      - {name: description, component: description}
+      - {name: tags, component: tags}
+      - {name: draft, component: draft}
+      - {name: reviewed, component: reviewed, required: true}
+      - {name: updated, component: updated}
+      - {name: created, component: created}
+      - {name: body, component: body, options: {media: finance_investing__images}}
+  - name: finance_investing__overview
+    label: Finance › Investing › Overview
+    type: file
+    path: src/content/docs/finance/investing/index.md
+    fields:
+      - {name: title, component: title}
+      - {name: description, component: description}
+      - {name: tags, component: tags}
+      - {name: reviewed, component: reviewed, required: true}
+      - {name: updated, component: updated}
+      - {name: body, component: body, options: {media: finance_investing__images}}
   - name: finance_mortgages
     label: Finance › Mortgages
     type: collection
@@ -115,6 +247,42 @@ content:
       - {name: reviewed, component: reviewed, required: true}
       - {name: updated, component: updated}
       - {name: body, component: body, options: {media: finance_mortgages__images}}
+  - name: finance_taxes
+    label: Finance › Taxes
+    type: collection
+    path: src/content/docs/finance/taxes
+    filename: "{primary}.md"
+    exclude: [index.md]
+    subfolders: false
+    operations:
+      rename: false
+    view:
+      primary: title
+      fields: [title, reviewed, draft]
+      sort: [title, reviewed]
+      default:
+        sort: title
+        order: asc
+    fields:
+      - {name: title, component: title}
+      - {name: description, component: description}
+      - {name: tags, component: tags}
+      - {name: draft, component: draft}
+      - {name: reviewed, component: reviewed, required: true}
+      - {name: updated, component: updated}
+      - {name: created, component: created}
+      - {name: body, component: body, options: {media: finance_taxes__images}}
+  - name: finance_taxes__overview
+    label: Finance › Taxes › Overview
+    type: file
+    path: src/content/docs/finance/taxes/index.md
+    fields:
+      - {name: title, component: title}
+      - {name: description, component: description}
+      - {name: tags, component: tags}
+      - {name: reviewed, component: reviewed, required: true}
+      - {name: updated, component: updated}
+      - {name: body, component: body, options: {media: finance_taxes__images}}
 settings:
   hide: true
   content:
